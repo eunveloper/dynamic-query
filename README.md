@@ -22,3 +22,4 @@ private DynamicRepository dynamicRepository;
 
 dynamicRepository.searchAllByConditions(Dto.class, qEntity, null);  // 3rd parameter is not supported
 ```
+  - 조회하고자 하는 Entity의 필드명과 얻고자 하는 DTO의 필드명 기준으로 동일하게 사용하여야 합니다.
