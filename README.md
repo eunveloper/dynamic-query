@@ -7,14 +7,40 @@ Spring Data JPA Querydsl 라이브러리를 사용하다보면 Entity마다 Repo
 <br/>
 
 # Function Release
+- 2022.06.16
+
+  - 단일 WHERE 절 구현 (equals / getter)
+
 - 2022.06.15
 
-  -   단일 SELECT 절 구현
-  -   단일 FROM 절 구현
+  - 단일 SELECT 절 구현
+  - 단일 FROM 절 구현
+
 
 <br/>
 
 # How To Use
+- 2022.06.16
+``` Java
+@Autowired
+private DynamicRepository dynamicRepository;
+
+dynamicRepository.searchAllByConditions(Dto.class, qEntity, SearchCondition...);
+
+public class SearchCondition {
+
+    private EntityPath path;
+    private Object param;
+    private Constant.Method method;
+
+}
+```
+  - Query에 WHERE절을 추가하고싶은 경우, 조건에 맞는 SearchCondition을 필요한 갯수만큼 생성하여 파라미터로 담아줍니다.
+  - SearchCondition을 구성하는 방식은 다음과 같습니다.
+    - EntityPath : 검색 기준이 되는 Entity의 QClass
+    - param : 검색 기준 값을 담는 객체 (Entity의 필드명과 동일해야 합니다.)
+    - Method : 검색 행위 (오늘기준 equals, getter 지원)
+
 - 2022.06.15
 ``` Java
 @Autowired
