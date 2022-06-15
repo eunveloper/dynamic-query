@@ -43,6 +43,7 @@ public class SearchCondition {
     - param : 검색 기준 값을 담는 객체 (Entity의 필드명과 동일해야 합니다.)
     - Method : 검색 행위 (오늘기준 equals, getter 지원)
 
+
 - 2022.06.15
 ``` Java
 @Autowired
