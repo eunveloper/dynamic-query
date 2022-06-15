@@ -26,16 +26,24 @@ public class DynamicQuery {
         return parameter == null ? null : stringPath.eq(parameter);
     }
 
-    public BooleanExpression eqBooleanParam(BooleanPath stringPath, Boolean parameter) {
-        return parameter == null ? null : stringPath.eq(parameter);
+    public BooleanExpression eqBooleanParam(BooleanPath booleanPath, Boolean parameter) {
+        return parameter == null ? null : booleanPath.eq(parameter);
     }
 
-    public BooleanExpression eqIntegerParam(NumberPath stringPath, Integer parameter) {
-        return parameter == null ? null : stringPath.eq(parameter);
+    public BooleanExpression eqIntegerParam(NumberPath numberPath, Integer parameter) {
+        return parameter == null ? null : numberPath.eq(parameter);
     }
 
-    public BooleanExpression eqLongParam(NumberPath<Long> stringPath, Long parameter) {
-        return parameter == null ? null : stringPath.eq(parameter);
+    public BooleanExpression eqLongParam(NumberPath<Long> numberPath, Long parameter) {
+        return parameter == null ? null : numberPath.eq(parameter);
+    }
+
+    public BooleanExpression gtIntegerParam(NumberPath numberPath, Integer parameter) {
+        return parameter == null ? null : numberPath.gt(parameter);
+    }
+
+    public BooleanExpression gtLongParam(NumberPath<Long> numberPath, Long parameter) {
+        return parameter == null ? null : numberPath.gt(parameter);
     }
 
 }

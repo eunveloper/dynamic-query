@@ -27,5 +27,6 @@ public class UserInfo {
     private boolean inUse;
     private String accessRoles;
     private boolean marketingAgreement;
+    private int checkCount;
 
 }
