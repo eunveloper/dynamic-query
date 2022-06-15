@@ -12,5 +12,7 @@ public class UserDto {
     private String phone;
     private String company;
     private String country;
+    private Boolean inUse;
+    private Integer checkCount;
 
 }
