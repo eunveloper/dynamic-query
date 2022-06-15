@@ -26,7 +26,9 @@ Spring Data JPA Querydsl 라이브러리를 사용하다보면 Entity마다 Repo
 private DynamicRepository dynamicRepository;
 
 dynamicRepository.searchAllByConditions(Dto.class, qEntity, SearchCondition...);
+```
 
+``` Java
 public class SearchCondition {
 
     private EntityPath path;
