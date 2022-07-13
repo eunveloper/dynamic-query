@@ -37,7 +37,7 @@ searchCondition
 
 dynamicRepository.searchAllByConditions(UserDto.class, qUser, searchCondition);
 ```
-  - 사용자가 Entity 별로 SearchCondition 객체를 생성할 필요가 없습니다.
+  - 사용자 Entity 별로 SearchCondition 객체를 생성할 필요가 없습니다.
   - 사용자는 단일 SearchCondition 객체를 통해 원하는 WHERE절 조건만큼 addCondition() 함수를 이용합니다.
   - 파라미터 순서는 다음과 같습니다 (검색 Entity QClass, 검색 필드명, 검색 내용, 검색 행위)
 
