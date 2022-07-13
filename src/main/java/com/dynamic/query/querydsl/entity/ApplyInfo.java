@@ -5,8 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -26,5 +25,9 @@ public class ApplyInfo {
     private String resolution;
     private boolean accountUse;
     private Integer applyOrder;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "applyInfos")
+    private UserInfo userInfo;
 
 }

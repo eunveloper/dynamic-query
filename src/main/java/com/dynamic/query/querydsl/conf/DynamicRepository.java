@@ -1,12 +1,10 @@
 package com.dynamic.query.querydsl.conf;
 
 import com.dynamic.query.querydsl.Constant;
-import com.dynamic.query.querydsl.SearchCondition;
+import com.dynamic.query.querydsl.obj.Condition;
+import com.dynamic.query.querydsl.obj.SearchCondition;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.EntityPath;
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.*;
 import com.querydsl.core.types.dsl.BooleanPath;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.core.types.dsl.StringPath;
@@ -30,19 +28,19 @@ public class DynamicRepository<Response> {
 
     public List<Response> searchAllByConditions(Class<Response> response,
                                                 EntityPath entityPath,
-                                                SearchCondition... conditions) {
-        return searchAllByDynamicQuery(response, entityPath, conditions).fetch();
+                                                SearchCondition searchCondition) {
+        return searchAllByDynamicQuery(response, entityPath, searchCondition).fetch();
     }
 
     private JPAQuery<Response> searchAllByDynamicQuery(Class<Response> response,
                                                        EntityPath entityPath,
-                                                       SearchCondition... conditions) {
+                                                       SearchCondition searchCondition) {
         JPAQuery<Response> query = null;
         try {
             query = queryFactory
                     .select(createSelectExpressionsQuery(response.newInstance(), entityPath))
                     .from(entityPath)
-                    .where(createWhereConditionsQuery(conditions));
+                    .where(createWhereConditionsQuery(searchCondition));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -88,82 +86,74 @@ public class DynamicRepository<Response> {
         return expressions;
     }
 
-    private Predicate createWhereConditionsQuery(SearchCondition... conditions) {
+    private Predicate createWhereConditionsQuery(SearchCondition searchCondition) {
         BooleanBuilder builder = new BooleanBuilder();
-        for (SearchCondition condition : conditions) {
-            createConditionsQueryByMethod(builder, condition, condition.getMethod());
+        for (EntityPath entityPath : searchCondition.getConditionsMap().keySet()) {
+            List<Condition> conditions = searchCondition.getConditionsMap().get(entityPath);
+            createConditionsQueryByEntityConditions(builder, entityPath, conditions);
+
         }
 
         return builder.getValue();
     }
 
-    private void createConditionsQueryByMethod(BooleanBuilder builder, SearchCondition condition, Constant.Method method) {
-        Map<String, Object> mapperMap = createParamMapperMap(condition.getParam());
-        EntityPath entityPath = condition.getPath();
+    private void createConditionsQueryByEntityConditions(BooleanBuilder builder, EntityPath entityPath, List<Condition> conditions) {
+        Map<String, Condition> mapperMap = createParamConditionMapperMap(conditions);
         Field[] entityFields = entityPath.getClass().getDeclaredFields();
         for (Field field : entityFields) {
             field.setAccessible(true);
-            try {
-                createConditionsQuery(builder, field, field.get(entityPath), mapperMap, method);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+
+            String fieldName = field.getName();
+            Condition condition = mapperMap.get(fieldName);
+            if (condition != null) {
+                createConditionsQuery(builder, condition);
             }
         }
     }
 
-    private Map<String, Object> createParamMapperMap(Object param) {
-        Map<String, Object> mapperMap = new HashMap<>();
-
-        Field[] responseFields = param.getClass().getDeclaredFields();
-        for (Field field : responseFields) {
-            field.setAccessible(true);
-            try {
-                Object value = field.get(param);
-                if (value != null) {
-                    mapperMap.put(field.getName(), value);
-                }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+    private void createConditionsQuery(BooleanBuilder builder, Condition condition) {
+        Path path = condition.getParam();
+        Constant.Method method = condition.getMethod();
+        Object value = condition.getValue();
+        if (path instanceof StringPath) {
+            switch (method) {
+                case EQ:
+                    builder.and(dynamicQuery.eqStringParam(
+                            (StringPath) path, (String) value));
+                    break;
             }
+        }
+        if (path instanceof BooleanPath) {
+            switch (method) {
+                case EQ:
+                    builder.and(dynamicQuery.eqBooleanParam(
+                            (BooleanPath) path, (Boolean) value));
+                    break;
+
+            }
+        }
+        if (path instanceof NumberPath) {
+            switch (method) {
+                case EQ:
+                    builder.and(dynamicQuery.eqIntegerParam(
+                            (NumberPath) path, (Integer) value));
+                    break;
+                case GT:
+                    builder.and(dynamicQuery.gtIntegerParam(
+                            (NumberPath) path, (Integer) value));
+                    break;
+            }
+        }
+    }
+
+    private Map<String, Condition> createParamConditionMapperMap(List<Condition> param) {
+        Map<String, Condition> mapperMap = new HashMap<>();
+
+        for (Condition condition : param) {
+            mapperMap.put(condition.getParam().toString().split("\\.")[1], condition);
         }
 
         return mapperMap;
-    }
-
-    private void createConditionsQuery(BooleanBuilder builder, Field field, Object path, Map<String, Object> mapperMap,
-                                       Constant.Method method) throws IllegalAccessException {
-        String fieldName = field.getName();
-        if (mapperMap.get(fieldName) != null) {
-            if (path instanceof StringPath) {
-                switch (method) {
-                    case EQ:
-                        builder.and(dynamicQuery.eqStringParam(
-                                (StringPath) path, (String) mapperMap.get(fieldName)));
-                        break;
-                }
-            }
-            if (path instanceof BooleanPath) {
-                switch (method) {
-                    case EQ:
-                        builder.and(dynamicQuery.eqBooleanParam(
-                                (BooleanPath) path, (Boolean) mapperMap.get(fieldName)));
-                        break;
-
-                }
-            }
-            if (path instanceof NumberPath) {
-                switch (method) {
-                    case EQ:
-                        builder.and(dynamicQuery.eqIntegerParam(
-                                (NumberPath) path, (Integer) mapperMap.get(fieldName)));
-                        break;
-                    case GT:
-                        builder.and(dynamicQuery.gtIntegerParam(
-                                (NumberPath) path, (Integer) mapperMap.get(fieldName)));
-                        break;
-                }
-            }
-        }
     }
 
 }
