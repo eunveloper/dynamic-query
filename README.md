@@ -41,7 +41,7 @@ dynamicRepository.searchAllByConditions(UserDto.class, qUser, searchCondition);
   - 사용자는 단일 SearchCondition 객체를 통해 원하는 WHERE절 조건만큼 addCondition() 함수를 이용합니다.
   - 파라미터 순서는 다음과 같습니다 (검색 Entity QClass, 검색 필드명, 검색 내용, 검색 행위)
 
-
+<br/>
 
 - 2022.06.16
 ``` Java
@@ -66,8 +66,7 @@ public class SearchCondition {
     - param : 검색 기준 값을 담는 객체 (Entity의 필드명과 동일해야 합니다.)
     - Method : 검색 행위 (오늘기준 equals, getter 지원)
 
-
-
+<br/>
 
 - 2022.06.15
 ``` Java
