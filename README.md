@@ -17,7 +17,7 @@ Spring Data JPA Querydsl 라이브러리를 사용하다보면 Entity마다 Repo
 - 2022.06.15
 
   - 단일 SELECT 절 구현
-  - 단일 FROM 절 구현
+  - FROM 절 구현
 
 
 <br/>
