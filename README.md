@@ -7,6 +7,9 @@ Spring Data JPA Querydsl 라이브러리를 사용하다보면 Entity마다 Repo
 <br/>
 
 # Function Release
+- 2022.07.14
+  - WHERE 절 사용방식 간편화
+
 - 2022.06.16
 
   - 단일 WHERE 절 구현 (equals / getter)
@@ -20,6 +23,22 @@ Spring Data JPA Querydsl 라이브러리를 사용하다보면 Entity마다 Repo
 <br/>
 
 # How To Use
+- 2022.07.14
+``` Java
+@Autowired
+private DynamicRepository dynamicRepository;
+
+SearchCondition searchCondition = new SearchCondition();
+searchCondition
+        .addCondition(qUser, qUser.email, "eun7991e@ex-em.com", Constant.Method.EQ)
+        .addCondition(qUser, qUser.userNm, "김은혜", Constant.Method.EQ)
+        .addCondition(qUser, qUser.accessRoles , "admin", Constant.Method.EQ)
+        .addCondition(qUser, qUser.checkCount, 5, Constant.Method.GT);
+
+dynamicRepository.searchAllByConditions(UserDto.class, qUser, searchCondition);
+```
+  - 사용자가 
+
 - 2022.06.16
 ``` Java
 @Autowired
