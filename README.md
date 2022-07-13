@@ -30,7 +30,7 @@ private DynamicRepository dynamicRepository;
 
 SearchCondition searchCondition = new SearchCondition();
 searchCondition
-        .addCondition(qUser, qUser.email, "eun7991e@ex-em.com", Constant.Method.EQ)
+        .addCondition(qUser, qUser.email, "eunveloper@gmail.com", Constant.Method.EQ)
         .addCondition(qUser, qUser.userNm, "김은혜", Constant.Method.EQ)
         .addCondition(qUser, qUser.accessRoles , "admin", Constant.Method.EQ)
         .addCondition(qUser, qUser.checkCount, 5, Constant.Method.GT);
