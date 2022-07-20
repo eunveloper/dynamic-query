@@ -2,6 +2,8 @@ package com.dynamic.query.querydsl.conf;
 
 import com.dynamic.query.querydsl.Constant;
 import com.dynamic.query.querydsl.obj.Condition;
+import com.dynamic.query.querydsl.obj.JoinMap;
+import com.dynamic.query.querydsl.obj.JoinMaps;
 import com.dynamic.query.querydsl.obj.SearchCondition;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.*;
@@ -26,26 +28,61 @@ public class DynamicRepository<Response> {
     private final JPAQueryFactory queryFactory;
     private final DynamicQuery dynamicQuery;
 
-    public List<Response> searchAllByConditions(Class<Response> response,
-                                                EntityPath entityPath,
+    public List<Response> searchAllByConditions(EntityPath fromEntityPath,
                                                 SearchCondition searchCondition) {
-        return searchAllByDynamicQuery(response, entityPath, searchCondition).fetch();
+        return searchAllByDynamicQuery(null, fromEntityPath, null, searchCondition).fetch();
+    }
+
+    public List<Response> searchAllByConditions(Class<Response> response,
+                                                EntityPath fromEntityPath,
+                                                SearchCondition searchCondition) {
+        return searchAllByDynamicQuery(response, fromEntityPath, null, searchCondition).fetch();
+    }
+
+    public List<Response> searchAllByConditions(Class<Response> response,
+                                                EntityPath fromEntityPath,
+                                                JoinMaps joinMaps,
+                                                SearchCondition searchCondition) {
+        return searchAllByDynamicQuery(response, fromEntityPath, joinMaps, searchCondition).fetch();
     }
 
     private JPAQuery<Response> searchAllByDynamicQuery(Class<Response> response,
-                                                       EntityPath entityPath,
+                                                       EntityPath fromEntityPath,
+                                                       JoinMaps joinMaps,
                                                        SearchCondition searchCondition) {
         JPAQuery<Response> query = null;
         try {
             query = queryFactory
-                    .select(createSelectExpressionsQuery(response.newInstance(), entityPath))
-                    .from(entityPath)
-                    .where(createWhereConditionsQuery(searchCondition));
+                    .select(createSelectExpressionsQuery(response.newInstance(), fromEntityPath))
+                    .from(fromEntityPath);
+            if (joinMaps != null) {
+                createJoinExpressionsQuery(query, joinMaps);
+            }
+            query.where(createWhereConditionsQuery(searchCondition));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //System.out.println("query = " + query);
+        System.out.println("query = " + query);
         return query;
+    }
+
+    private void createJoinExpressionsQuery(JPAQuery<Response> query, JoinMaps joinMaps) {
+        for (JoinMap joinMap : joinMaps.getJoinMaps()) {
+            switch (joinMap.getJoin()) {
+                case INNER:
+                    if (joinMap.getBasicObjPath() instanceof StringPath) {
+                        query
+                                .innerJoin(joinMap.getTargetEntityPath())
+                                .on(((StringPath) joinMap.getBasicObjPath()).eq(joinMap.getTargetObjPath()))
+                                .fetchJoin();
+                    }
+                    break;
+                case NATURAL:
+                case CROSS:
+                case LEFT_OUTER:
+                case RIGHT_OUTER:
+            }
+        }
     }
 
     private Expression<Response> createSelectExpressionsQuery(Response response, EntityPath entityPath) {

@@ -6,4 +6,8 @@ public class Constant {
         EQ, GT, LT
     }
 
+    public enum Join {
+        INNER, NATURAL, LEFT_OUTER, RIGHT_OUTER, CROSS
+    }
+
 }
